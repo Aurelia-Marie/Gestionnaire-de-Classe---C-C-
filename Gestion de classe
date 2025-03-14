@@ -1,0 +1,936 @@
+Conversation ouverte. 1 message lu. 
+
+Aller au contenu
+Utiliser Gmail avec un lecteur d'écran
+in:sent 
+26 sur 137
+Code à envoyer 
+
+Aurelia Forson <aureliaforson31@gmail.com>
+mar. 31 déc. 2024 14:22
+À orceliaf, askwenda08
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+#include <string.h>
+
+
+
+// Structure pour représenter un élève
+
+typedef struct {
+ int idEleve;
+ char nomEleve[100];
+char pnomEleve[100];
+char promo[100];
+float ensnotes[100];
+ int nbNotes;
+  float moyenne;
+char matieres[100][100]; // Noms des matières associées aux notes
+} Eleve;
+
+int nbEleves = 0;
+Eleve *eleves = NULL; // Pointeur global pour stocker les élèves
+// Ajouter un élève
+void ajouterEleve() {
+    // Réallocation de mémoire pour ajouter un nouvel élève
+    Eleve *nouvelletaille = (Eleve*) realloc(eleves, (nbEleves + 1) * sizeof(Eleve));
+    if (nouvelletaille == NULL) {
+        printf("Erreur de réallocation de mémoire.\n");
+        return;
+    }
+    eleves = nouvelletaille;
+    Eleve nouveau;
+    nouveau.idEleve = nbEleves + 1;
+    nouveau.nbNotes = 0;
+    printf("Saisir le prénom : ");
+ scanf("%s", nouveau.pnomEleve);
+    printf("Saisir le nom : ");
+    scanf("%s", nouveau.nomEleve);
+    printf("Saisir la promotion : ");
+    scanf("%s", nouveau.promo);
+    eleves[nbEleves] = nouveau;  // Ajout de l'élève dans le tableau
+    nbEleves++;
+    printf("Élève ajouté avec succès !\n");
+
+}
+
+// Fonction pour lister les élèves
+
+// Fonction pour recalculer les moyennes de tous les élèves
+void recalculerMoyennes() {
+    for (int i = 0; i < nbEleves; i++) {
+        float sommeNotes = 0;
+        for (int j = 0; j < eleves[i].nbNotes; j++) {
+            sommeNotes += eleves[i].ensnotes[j];
+        }
+        if (eleves[i].nbNotes > 0) {
+            eleves[i].moyenne = sommeNotes / eleves[i].nbNotes;
+        } else {
+            eleves[i].moyenne = 0.0;
+        }
+    }
+}
+
+// Fonction pour lister les élèves
+void listerEleves() {
+    if (nbEleves == 0) {
+        printf("Aucun élève enregistré.\n");
+        return;
+    }
+
+    // Recalculer les moyennes avant l'affichage
+    recalculerMoyennes();
+
+    printf("Liste des élèves :\n");
+    for (int i = 0; i < nbEleves; i++) {
+        printf("ID: %d, Prénom: %s, Nom: %s, Promotion: %s, Moyenne: %.2f\n",
+               eleves[i].idEleve, eleves[i].pnomEleve, eleves[i].nomEleve, eleves[i].promo, eleves[i].moyenne);
+    }
+}
+
+
+
+
+// Fonction pour supprimer un élève
+
+void supprimerEleve() {
+
+    if (nbEleves == 0) {
+
+        printf("Aucun élève à supprimer.\n");
+
+        return;
+
+    }
+
+
+
+    int idASupp;
+
+    printf("Saisir l'ID de l'élève à supprimer : ");
+
+    scanf("%d", &idASupp);
+
+
+
+    // Recherche de l'élève avec l'ID
+
+    int indexASupp = -1;
+
+    for (int i = 0; i < nbEleves; i++) {
+
+        if (eleves[i].idEleve == idASupp) {
+
+            indexASupp = i;
+
+            break;
+
+        }
+
+    }
+
+
+
+    if (indexASupp == -1) {
+
+        printf("Aucun élève trouvé avec l'ID %d.\n", idASupp);
+
+        return;
+
+    }
+
+
+
+    // Mise à jour des IDs et déplacement des éléments
+
+    for (int i = indexASupp; i < nbEleves - 1; i++) {
+
+        eleves[i] = eleves[i + 1];
+
+        eleves[i].idEleve = i + 1;  // Recalcule l'ID pour chaque élève
+
+    }
+
+
+
+    nbEleves--;
+
+
+
+    // Réallocation de mémoire après suppression
+
+    Eleve *nouvelleMemoire = (Eleve*) realloc(eleves, nbEleves * sizeof(Eleve));
+
+    if (nouvelleMemoire == NULL && nbEleves > 0) {
+
+        printf("Erreur de réallocation de mémoire après suppression.\n");
+
+        return;
+
+    }
+
+    eleves = nouvelleMemoire;
+
+
+
+    printf("Élève %d supprimé avec succès.\n", idASupp);
+
+}
+
+
+
+// Afficher les détails d'un élève
+void afficherDetailEleve() {
+    if (nbEleves == 0) {
+        printf("Aucun élève enregistré\n");
+        return;
+    }
+
+    int idRecherche;
+    printf("ID de l'élève : ");
+    scanf("%d", &idRecherche);
+
+    // Recherche de l'élève avec l'ID
+    Eleve *eleveTrouve = NULL;
+    for (int i = 0; i < nbEleves; i++) {
+        if (eleves[i].idEleve == idRecherche) {
+            eleveTrouve = &eleves[i];
+            break;
+        }
+    }
+
+    if (eleveTrouve == NULL) {
+        printf("Aucun élève trouvé avec l'ID %d.\n", idRecherche);
+        return;
+    }
+
+    printf("\nDétail de l'élève\n");
+    printf("ID : %d\n", eleveTrouve->idEleve);
+    printf("Prénom : %s\n", eleveTrouve->pnomEleve);
+    printf("Nom : %s\n", eleveTrouve->nomEleve);
+    printf("Promotion : %s\n", eleveTrouve->promo);
+
+    printf("Notes : \n");
+    if (eleveTrouve->nbNotes == 0) {
+        printf("Aucune note enregistrée.\n");
+    } else {
+        float sommeNotes = 0;
+        for (int j = 0; j < eleveTrouve->nbNotes; j++) {
+            printf("Matière : %s, Note : %.2f\n",
+                   eleveTrouve->matieres[j], eleveTrouve->ensnotes[j]);
+            sommeNotes += eleveTrouve->ensnotes[j];
+        }
+        eleveTrouve->moyenne = sommeNotes / eleveTrouve->nbNotes;
+        printf("Moyenne : %.2f\n", eleveTrouve->moyenne);
+    }
+}
+
+
+
+// Modifier un élève
+
+void modifierEleve() {
+
+    if (nbEleves == 0) {
+
+        printf("Aucun élève enregistré");
+
+        return;
+
+    }
+
+
+
+    int idRecherche;
+
+    printf("ID de l'élève: ");
+
+    scanf("%d", &idRecherche);
+
+
+
+    Eleve *eleveTrouve = NULL;
+
+    for (int i = 0; i < nbEleves; i++) {
+
+        if (eleves[i].idEleve == idRecherche) {
+
+            eleveTrouve = &eleves[i];
+
+            break;
+
+        }
+
+    }
+
+
+
+    if (eleveTrouve == NULL) {
+
+        printf("Aucun élève trouvé avec l'ID %d.\n", idRecherche);
+
+        return;
+
+    }
+
+
+
+    printf("Modification des infos de %d\n", idRecherche);
+
+
+
+    // Modifier le prénom
+
+    printf("Nouveau prénom (%s) : ", eleveTrouve->pnomEleve);
+
+    scanf("%99s", eleveTrouve->pnomEleve);
+
+
+
+    // Modifier le nom
+
+    printf("Nouveau nom (%s) : ", eleveTrouve->nomEleve);
+
+    scanf("%99s", eleveTrouve->nomEleve);
+
+
+
+    // Modifier la promotion
+
+    printf("Nouvelle promotion (%s) : ", eleveTrouve->promo);
+
+    scanf("%99s", eleveTrouve->promo);
+
+
+
+    // Modifier les notes
+
+    printf("Nombre actuel de notes : %d\n", eleveTrouve->nbNotes);
+
+    printf("Voulez-vous modifier les notes ? (1: Oui, 0: Non) : ");
+
+    int modifierNotes;
+
+    scanf("%d", &modifierNotes);
+
+
+
+    if (modifierNotes) {
+
+        printf("Saisir le nouveau nombre de notes : ");
+
+        int nouveauNbNotes;
+
+        scanf("%d", &nouveauNbNotes);
+
+
+
+        if (nouveauNbNotes > 100) {
+
+            printf("Erreur ! Nombre maximum de notes est 100.\n");
+
+            return;
+
+        }
+
+
+
+        eleveTrouve->nbNotes = nouveauNbNotes;
+
+        float sommeNotes = 0;
+
+
+
+        for (int i = 0; i < nouveauNbNotes; i++) {
+
+            printf("Saisir la note %d : ", i + 1);
+
+            scanf("%f", &eleveTrouve->ensnotes[i]);
+
+            sommeNotes += eleveTrouve->ensnotes[i];
+
+        }
+
+
+
+        eleveTrouve->moyenne = sommeNotes / nouveauNbNotes;
+
+        printf(" Nouvelle moyenne : %.2f\n", eleveTrouve->moyenne);
+
+    }
+
+}
+
+void ajouterNote() {
+    if (nbEleves == 0) {
+        printf("Aucun élève enregistré\n");
+        return;
+    }
+
+    char matiere[50];
+    printf("Saisir la matière : ");
+    scanf("%49s", matiere);
+
+    for (int i = 0; i < nbEleves; i++) {
+        printf("Saisir une note pour %d (%s %s) dans la matière %s : ", eleves[i].idEleve, eleves[i].pnomEleve, eleves[i].nomEleve, matiere);
+
+        float nouvelleNote;
+        scanf("%f", &nouvelleNote);
+
+        if (eleves[i].nbNotes >= 100) {
+            printf("Erreur : Nombre maximum de notes atteint pour l'élève %d.\n", eleves[i].idEleve);
+            continue;
+        }
+
+        eleves[i].ensnotes[eleves[i].nbNotes] = nouvelleNote;
+        strcpy(eleves[i].matieres[eleves[i].nbNotes], matiere);
+        eleves[i].nbNotes++;
+    }
+}
+
+// Calculer les moyennes par matière pour un élève
+void calculerMoyennesParMatiere() {
+    if (nbEleves == 0) {
+        printf("Aucun élève enregistré\n");
+        return;
+    }
+
+    int idRecherche;
+    printf("Saisir l'ID de l'élève : ");
+    scanf("%d", &idRecherche);
+
+    Eleve *eleveTrouve = NULL;
+    for (int i = 0; i < nbEleves; i++) {
+        if (eleves[i].idEleve == idRecherche) {
+            eleveTrouve = &eleves[i];
+            break;
+        }
+    }
+
+    if (eleveTrouve == NULL) {
+        printf("Aucun élève trouvé avec l'ID %d.\n", idRecherche);
+        return;
+    }
+
+    printf("\nMoyennes par matière pour l'élève %d (%s %s) :\n", eleveTrouve->idEleve, eleveTrouve->pnomEleve, eleveTrouve->nomEleve);
+
+    char matieresDistinctes[100][50];
+    int nbMatieresDistinctes = 0;
+
+    for (int i = 0; i < eleveTrouve->nbNotes; i++) {
+        int existe = 0;
+        for (int j = 0; j < nbMatieresDistinctes; j++) {
+            if (strcmp(eleveTrouve->matieres[i], matieresDistinctes[j]) == 0) {
+                existe = 1;
+                break;
+            }
+        }
+        if (!existe) {
+            strcpy(matieresDistinctes[nbMatieresDistinctes], eleveTrouve->matieres[i]);
+            nbMatieresDistinctes++;
+        }
+    }
+
+    for (int i = 0; i < nbMatieresDistinctes; i++) {
+        const char *matiere = matieresDistinctes[i];
+        float somme = 0;
+        int compteur = 0;
+
+        for (int j = 0; j < eleveTrouve->nbNotes; j++) {
+            if (strcmp(eleveTrouve->matieres[j], matiere) == 0) {
+                somme += eleveTrouve->ensnotes[j];
+                compteur++;
+            }
+        }
+
+        if (compteur > 0) {
+            printf("Matière : %s, Moyenne : %.2f\n", matiere, somme / compteur);
+        }
+    }
+}
+
+
+// Fonction  pour trier par nom
+
+void trierParNom() {
+
+    for (int i = 0; i < nbEleves-1; i++) {
+
+        for (int j = 0; j < (nbEleves-1)- i; j++) {
+
+            if (strcasecmp(eleves[j].nomEleve, eleves[j + 1].nomEleve) > 0) {
+
+                Eleve temp = eleves[j];
+
+                eleves[j] = eleves[j + 1];
+
+                eleves[j + 1] = temp;
+
+            }
+
+        }
+
+    }
+
+    printf("Élèves triés par nom.\n");
+
+}
+
+
+
+// Fonction  pour trier par prénom
+
+void trierParPrenom() {
+
+    for (int i = 0; i < nbEleves-1; i++) {
+
+        for (int j = 0; j < (nbEleves-1)- i; j++) {
+
+            if (strcasecmp(eleves[j].pnomEleve, eleves[j + 1].pnomEleve) > 0) {
+
+                Eleve temp = eleves[j];
+
+                eleves[j] = eleves[j + 1];
+
+                eleves[j + 1] = temp;
+
+            }
+
+        }
+
+    }
+
+    printf("Élèves triés par prénom.\n");
+
+}
+
+
+
+// Fonction pour trier par promotion
+
+void trierParPromo() {
+
+    for (int i = 0; i < nbEleves-1; i++) {
+
+        for (int j = 0; j < (nbEleves-1) - i; j++) {
+
+            if (strcasecmp(eleves[j].promo, eleves[j + 1].promo) > 0) {
+
+                Eleve temp = eleves[j];
+
+                eleves[j] = eleves[j + 1];
+
+                eleves[j + 1] = temp;
+
+            }
+
+        }
+
+    }
+
+    printf("Élèves triés par promotion.\n");
+
+}
+
+void trierParMoyenne() {
+
+    for (int i = 0; i < nbEleves; i++) {
+
+        float sommeNotes = 0;
+
+        for (int j = 0; j < eleves[i].nbNotes; j++) {
+
+            sommeNotes=sommeNotes+eleves[i].ensnotes[j];
+
+        }
+
+        eleves[i].moyenne = (float)sommeNotes / eleves[i].nbNotes;
+
+}
+
+
+
+    for (int i = 0; i < nbEleves - 1; i++) {
+
+        for (int j = 0; j < (nbEleves - 1)-i; j++) {
+
+            if (eleves[j].moyenne < eleves[j + 1].moyenne) {
+
+                // Échange des élèves
+
+                Eleve temp = eleves[j];
+
+                eleves[j] = eleves[j + 1];
+
+                eleves[j + 1] = temp;
+
+            }
+
+        }
+
+    }
+
+
+
+    printf("Élèves triés par moyenne.\n");
+
+}
+
+void listerPromotions() {
+
+    if (nbEleves == 0) {
+
+        printf("Aucun élève enregistré\n");
+
+        return;
+
+    }
+
+
+
+    // Infos par promotion
+
+    typedef struct {
+
+        char promo[100];
+
+        int nbEleves;
+
+        float sommeMoyennes;
+
+    } PromotionStats;
+
+
+
+    PromotionStats stats[100];
+
+    int nbPromotions = 0;
+
+
+
+    //  Regroupement des élèves par promotion
+
+    for (int i = 0; i < nbEleves; i++) {
+
+        int indexPromo = -1;
+
+        for (int j = 0; j < nbPromotions; j++) {
+
+            if (strcmp(stats[j].promo, eleves[i].promo) == 0) {   //Vérifie que l'élève n'appartient pas déjà à une autre promotion
+
+                indexPromo = j;
+
+                break;
+
+            }
+
+        }
+
+
+
+        if (indexPromo == -1) {
+
+            // Nouvelle promotion trouvée
+
+            strcpy(stats[nbPromotions].promo, eleves[i].promo);
+
+            stats[nbPromotions].nbEleves = 1;
+
+            stats[nbPromotions].sommeMoyennes = eleves[i].moyenne;
+
+            nbPromotions++;
+
+        } else {
+
+            // Promotion existante
+
+            stats[indexPromo].nbEleves++;
+
+            stats[indexPromo].sommeMoyennes += eleves[i].moyenne;
+
+        }
+
+    }
+
+
+
+    printf("\n Liste des promotions \n");
+
+    for (int i = 0; i < nbPromotions; i++) {
+
+        printf("Promotion : %s\n", stats[i].promo);
+
+        printf("Nombre d'élèves : %d\n", stats[i].nbEleves);
+
+        printf("Moyenne classe : %.2f\n\n", stats[i].sommeMoyennes / stats[i].nbEleves);
+
+    }
+
+}
+
+void ElevesParPromotion() {
+
+    if (nbEleves == 0) {
+
+        printf("Aucun élève enregistré\n");
+
+        return;
+
+    }
+
+
+
+    char promoRech[100];
+
+    printf("Saisir le nom de la promotion : ");
+
+    scanf("%99s", promoRech);
+
+
+
+    int elevesTrouves = 0;
+
+    printf("\n  Liste des élèves de la promotion %s   \n", promoRech);
+
+
+
+    for (int i = 0; i < nbEleves; i++) {
+
+        if (strcmp(eleves[i].promo, promoRech) == 0) {
+
+            printf("ID: %d, Prénom: %s, Nom: %s, Moyenne: %.2f\n",
+
+                   eleves[i].idEleve, eleves[i].pnomEleve, eleves[i].nomEleve, eleves[i].moyenne);
+
+            elevesTrouves++;
+
+        }
+
+    }
+
+
+
+    if (elevesTrouves == 0) {
+
+        printf("Aucun élève trouvé dans la promotion %s.\n", promoRech);
+
+    }
+
+}
+
+// Menu principal
+
+void afficherMenu() {
+
+    printf("\n--- Gestionnaire d'élèves ---\n");
+
+    printf("1- Lister tous les élèves\n");
+
+    printf("2- Ajouter un nouvel élève\n");
+
+    printf("3- Supprimer un élève\n");
+
+    printf("4- Détail d'un élève\n");
+
+    printf("5- Modifier un élève\n");
+
+    printf("6- Ajouter des notes\n");
+
+    printf("7- Trier les élèves\n");
+
+    printf ("8- Gestion des promotions\n");
+   
+    printf("9- Les moyennes par matière\n");
+
+    printf("10- Quitter\n");
+
+}
+
+
+
+// Fonction principale
+
+int main() {
+
+    // Initialisation de la mémoire pour le tableau d'élèves
+
+    eleves = (Eleve*) malloc(0 * sizeof(Eleve));
+
+    if (eleves == NULL) {
+
+        printf("Erreur d'allocation mémoire\n");
+
+        return 1;
+
+    }
+
+
+
+    int choix;
+
+    do {
+
+        afficherMenu();
+
+        scanf("%d", &choix);
+
+
+
+        switch (choix) {
+
+            case 1:
+
+                listerEleves();
+
+                break;
+
+            case 2:
+
+                ajouterEleve();
+
+                break;
+
+            case 3:
+
+                supprimerEleve();
+
+                break;
+
+            case 4:
+
+                afficherDetailEleve();
+
+                break;
+
+            case 5:
+
+                modifierEleve();
+
+                break;
+
+                   case 6:
+
+                ajouterNote();
+
+                break;
+
+            case 7:
+
+                // Trier les élèves
+
+                printf("Comment voulez-vous trier les élèves?\n");
+
+                printf("1- Par nom\n");
+
+                printf("2- Par prénom\n");
+
+                printf("3- Par promotion\n");
+
+                printf("4- Par moyenne\n");
+
+                int critere;
+
+                scanf("%d", &critere);
+
+                switch (critere) {
+
+                    case 1:
+
+                        trierParNom();
+
+                        break;
+
+                    case 2:
+
+                        trierParPrenom();
+
+                        break;
+
+                    case 3:
+
+                        trierParPromo();
+
+                        break;
+
+                        case 4:
+
+                        trierParMoyenne();
+
+                        break ;
+
+                        default:
+
+                        printf ("choix invalide");
+
+                    }
+
+                break;
+
+                case 8:
+
+                // Gerer les promos
+
+                printf("Comment voulez-vous gérer les promotions?\n");
+
+                printf("1- Lister les promotions\n");
+
+                printf("2- Lister les élèves par promotion\n");
+
+                int decision;
+
+                scanf("%d", &decision);
+
+                switch (decision) {
+
+                    case 1:
+
+                        listerPromotions();
+
+                        break;
+
+                    case 2:
+
+                      ElevesParPromotion();
+
+                        break;
+
+                        default:
+
+                        printf ("choix invalide");
+
+                    }
+
+                break;
+                 case 9:
+                calculerMoyennesParMatiere();
+                break;
+
+            case 10:
+
+                printf("Au revoir !\n");
+
+                break;
+
+            default:
+
+                printf("Choix invalide. Veuillez réessayer.\n");
+
+        }
+
+    } while (choix != 10);
+
+
+
+ 
+
+    free(eleves);
+
+
+
+    return 0;
+
+}
+
